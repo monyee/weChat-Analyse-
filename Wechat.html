@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title></title>
+	<link rel="stylesheet" href="">
+</head>
+<body>
+	<script>
+		
+		var info = {}
+		function redPack(leftCount,leftMoney){
+			var pushMoney;
+			var obj = info[testCount]; 
+
+			if(leftCount == 1){
+				pushMoney = leftMoney;
+				obj.unitMoney.push(pushMoney.toFixed(2));
+				leftCount--;
+
+				obj.total = 0;
+				obj.even = 0;
+				obj.odd = 0;
+				obj.inputNum = Math.floor(Math.random()*10);
+
+				obj.numbs = [];
+				for(var i=0; i<obj.unitMoney.length; i++){
+					var n = obj.unitMoney[i].substr(3);
+					if(!obj[n])
+						obj[n] = 1;
+					else
+						obj[n]++;
+					obj.total += n-0;
+
+					if( (n-0) % 2== 0)
+						obj.even++;
+					else
+						obj.odd++;
+
+					obj.numbs.push(n);
+
+					if(n==obj.inputNum){
+						if(!obj.get)
+							obj.get = 1;
+						else
+							obj.get++;
+					}
+				}
+				
+
+				//filter max repeat number.
+				obj.numbs.sort((a,b)=>{return a<b;});
+				obj.lackNum = '';
+				obj.lackCount = 0;
+				//lack number
+				for(var j=0; j<10; j++){
+					if(obj.numbs.indexOf(j+'') == -1){
+						obj.lackNum += ' '+j;
+						obj.lackCount ++;
+					}
+				}
+
+				obj.rateEO =  obj.odd+':'+obj.even;
+				info[testCount] = obj;
+				//console.log(obj);
+			}else{
+				var min = .01;
+				var max = leftMoney/leftCount * 2 * 100;
+				pushMoney = Math.round(min+ Math.random()*(max-min))/100;
+
+				obj.unitMoney.push(pushMoney.toFixed(2));
+				leftCount--;
+				leftMoney = leftMoney - pushMoney;
+				redPack(leftCount,leftMoney);
+			}
+		}
+
+
+		var testCount = 0;
+		var repeatCount = 100000;
+		for(var i=0; i<repeatCount; i++){
+			info[testCount] = {unitMoney:[]}
+		   redPack(10,10);
+
+		   testCount++;
+		}
+		
+		var analyse = {};
+		//analyse
+		for(var key in info){
+			var o = info[key];
+			for(i=0; i<10; i++){ //每个数字缺少的次数
+				if(!o[''+i]){
+					if(!analyse['lack'+i])
+						analyse['lack'+i] = 1;
+					else
+						analyse['lack'+i]++;
+				}
+			}
+			
+			if(o.get){
+				analyse['保本和盈利'] = !analyse['保本和盈利'] ? 1 : analyse['保本和盈利']+1; 
+				analyse['收支'+o.get] = !analyse['收支'+o.get] ? 1 : analyse['收支'+o.get]+1;
+			}else{
+				analyse['赔钱'] = !analyse['赔钱'] ? 1:analyse['赔钱']+1;
+			}
+
+		}
+
+		analyse['保本'] = analyse['收支1']
+		analyse['盈利'] = analyse['保本和盈利'] - analyse['保本'];
+		analyse.result = "保本概率："+analyse['保本']/repeatCount+'%  赔钱概率：'+analyse['赔钱']/repeatCount+'%  盈利概率：'+analyse['盈利']/repeatCount+'% ';
+		console.log("=========分析=========");
+		console.log(analyse);
+		
+
+		//每个数字缺少的概率是一样的
+			
+	</script>
+</body>
+</html>
