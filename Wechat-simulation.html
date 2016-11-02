@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title></title>
+	<link rel="stylesheet" href="">
+</head>
+<body>
+	<table id="panel">
+		
+	</table>
+
+	<script>
+		
+		var boss = {
+			money:1000,
+			offer:10,   //每包放10元
+			offerNum:10,  //每包10人分
+		}
+		var players = [];
+		var board = {}; //记录板
+		var sys = {
+			playerCount:10000, //玩的次数
+			currentCount:0, //当前次数
+		}
+
+
+		function initPlayer(){
+			for(var i=0; i<boss.offerNum; i++){
+				var player = {
+					name:'player'+(i+1),
+					money:1000,
+				}
+
+				players.push(player);
+			}
+
+			players[0].name = "GrounpMaster"; //群主  根据规则尾数两个相同群主免反包
+		}
+		
+
+		//抢红包
+		function grap(remainCount,remainMoney){
+			var player = players[players.length - remainCount];
+
+			if(remainCount == 1){
+				counter(player,remainMoney);
+				remainCount--;
+			}else{
+				var min = .01;
+				var max = remainMoney/remainCount * 2 ; 
+				var getMoney = Math.round((min+ Math.random()*(max-min))*100)/100;
+				counter(player,getMoney);
+				remainMoney -= player.getMoney;
+
+				remainCount--;
+				grap(remainCount,remainMoney);
+
+				//处理群主尾包情况
+				freeGrounpMaster();
+			}
+
+			function counter(player,getMoney){
+				player.getMoney = getMoney.toFixed(2);
+				player.tailNum = player.getMoney.substr(3);
+
+				player.money += player.getMoney-0;
+				if(player.tailNum == boss.currentTailNum ){ //尾数跟发包者相同
+					
+					boss.money += 10;
+					boss.currentWin += 10;
+					player.money -= 10;
+					player.currentLost = 10;
+				}
+			}
+
+		}
+
+
+		//判断条件免除群主的反包
+		function freeGrounpMaster(){
+			if(boss.currentWin >= 20 && players[0].currentLost == 10){
+				players[0].currentLost = 0;
+				players[0].money += 10;
+
+				boss.money -= 10;
+			}
+
+		}
+
+		//开启模拟
+		function lunch(){
+
+			initPlayer();
+
+			for(var i=0; i<sys.playerCount; i++){
+
+			   //boss 为红包贴上尾数
+			   boss.currentTailNum = Math.floor(Math.random()*10);
+			   //还原
+			   players.forEach(function(p){p.currentLost = 0;})
+			   boss.currentWin = 0; 
+			   boss.money -= boss.offer;
+
+			   grap(boss.offer,boss.offerNum);
+console.log(players)
+			   sys.currentCount++;
+			}
+			console.log('boss',boss);
+
+			var count = 0;
+			for(i=0; i<players.length; i++){
+				count += players[i].money;
+			}
+			console.log(count+boss.money)
+		}
+		
+		lunch();
+	
+			
+	</script>
+</body>
+</html>
