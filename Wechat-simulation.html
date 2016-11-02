@@ -15,13 +15,13 @@
 		
 		var boss = {
 			money:1000,
-			offer:10,   //每包放10元
+			offer:20,   //每包放数额
 			offerNum:10,  //每包10人分
 		}
 		var players = [];
 		var board = {}; //记录板
 		var sys = {
-			playerCount:10000, //玩的次数
+			playerCount:1000, //玩的次数
 			currentCount:0, //当前次数
 		}
 
@@ -43,7 +43,6 @@
 		//抢红包
 		function grap(remainCount,remainMoney){
 			var player = players[players.length - remainCount];
-
 			if(remainCount == 1){
 				counter(player,remainMoney);
 				remainCount--;
@@ -61,17 +60,17 @@
 				freeGrounpMaster();
 			}
 
-			function counter(player,getMoney){
-				player.getMoney = getMoney.toFixed(2);
-				player.tailNum = player.getMoney.substr(3);
+			function counter(player,_getMoney){ 	
+				player.getMoney = _getMoney.toFixed(2);
+				player.tailNum = player.getMoney.substr(-1);
 
 				player.money += player.getMoney-0;
 				if(player.tailNum == boss.currentTailNum ){ //尾数跟发包者相同
 					
-					boss.money += 10;
-					boss.currentWin += 10;
-					player.money -= 10;
-					player.currentLost = 10;
+					boss.money += boss.offer;
+					boss.currentWin += boss.offer;
+					player.money -= boss.offer;
+					player.currentLost = boss.offer;
 				}
 			}
 
@@ -80,11 +79,11 @@
 
 		//判断条件免除群主的反包
 		function freeGrounpMaster(){
-			if(boss.currentWin >= 20 && players[0].currentLost == 10){
+			if(boss.currentWin >= 20 && players[0].currentLost == boss.offer){
 				players[0].currentLost = 0;
-				players[0].money += 10;
+				players[0].money += boss.offer;
 
-				boss.money -= 10;
+				boss.money -= boss.offer;
 			}
 
 		}
@@ -103,7 +102,7 @@
 			   boss.currentWin = 0; 
 			   boss.money -= boss.offer;
 
-			   grap(boss.offer,boss.offerNum);
+			   grap(boss.offerNum,boss.offer);
 console.log(players)
 			   sys.currentCount++;
 			}
